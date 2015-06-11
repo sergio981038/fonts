@@ -1,6 +1,5 @@
-#!/usr/bin/python
-# Copyright 2010, Google Inc.
-# Author: Raph Levien (<firstname.lastname>@gmail.com)
+#!/usr/bin/env python
+# Copyright 2015, Google Inc.
 # Author: Dave Crossland (dave@understandinglimited.com)
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +14,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-# namelist.py: A FontForge python script for generating namelist files.
+# namelist.py: A fontTools python script for generating namelist files
 #
 # Usage:
 #
-#   $ namelist.py Font.ttf NameList.nam
-import fontforge, sys
-def main(fontFile, namFile):
-    font = fontforge.open(fontFile)
-    font.saveNamelist(namFile)
+#   $ namelist.py Font.ttf > NameList.nam
+import sys
+from fontTools.ttLib import TTFont
+from fontTools.unicode import Unicode
+
+def main(file_name):
+    font = TTFont(file_name)
+    for cmap in font["cmap"].tables: 
+        for item in cmap.cmap.items():
+            if Unicode[item[0]] not in ["????", "SPACE"]:
+                print hex(item[0]), Unicode[item[0]]
+    font.close()
+
 if __name__ == '__main__':
-    print "Font: " + sys.argv[1]
-    print "Namelist: " + sys.argv[2]
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1])
